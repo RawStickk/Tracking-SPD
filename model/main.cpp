@@ -160,7 +160,6 @@ void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len
         while (phi < phi0) {
             Point r = {sqrt(modulus_(rho)) * sin(phi - beta) + rho.x, sqrt(modulus_(rho)) * cos(phi - beta) + rho.y,
             sqrt(modulus_(rho)) * particle.p.z * phi / sqrt(modulus_(p_xy))};
-            fout << r.x << "," << r.y << "," << r.z << "\n";
             if (r.z > len) {
                 cout << i << " out \n";
                 out = true;
@@ -168,7 +167,6 @@ void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len
             }
 
             for (unsigned j = 0; j < pipes[i].size() && !hit; j++) {
-                double s = dist(r, pipes[i][j]);
                 if (dist(r, pipes[i][j]) < pipe_rad) {
                     hit = true;
                     cout << i << " hit \n";
