@@ -39,6 +39,14 @@ int sgn(double const y0, double const y1) {
 }
 
 Point calc(Pipe const &pipe1, Pipe const &pipe2) {
+    /// Description:
+    /// if XZ plane is parallel to both of the pipes then
+    /// coordinates X Z of equidistant point are the same of the intersection point of pipes axes
+    /// if the axes of pipes lied in the same plane
+    /// Y coord can be calculated easily as arithmetic average of  y coordinates of axes (taking into account radii of pipes)
+
+    /// this function rotates coord system so that the condition above is valid
+    /// then calculates the intersection point and converts its coords back to XYZ
     Point coord;
     double sin_a = pipe2.point.x / sqrt(pipe2.point.x * pipe2.point.x + pipe2.point.y * pipe2.point.y),
     cos_a = -pipe2.point.y  / sqrt(pipe2.point.x * pipe2.point.x + pipe2.point.y * pipe2.point.y);
