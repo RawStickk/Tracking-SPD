@@ -192,7 +192,7 @@ void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len
         while (phi < phi0) {
             Point r = {sqrt(modulus_(rho)) * sin(phi - beta) + rho.x, sqrt(modulus_(rho)) * cos(phi - beta) + rho.y,
             sqrt(modulus_(rho)) * particle.p.z * phi / sqrt(modulus_(p_xy))}; ///current position of the particle in XYZ
-            if (r.z > len) { ///check whether particle has flown out through the end of detector
+            if (abs(r.z) > len) { ///check whether particle has flown out through the end of detector
                 cout << i << " out \n";
                 out = true;
                 break;
