@@ -4,6 +4,7 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -150,6 +151,34 @@ void hits_output(vector<Hit> const &hits) {
     fout.close();
 }
 
+void get_track(vector<Wire> const *pipes, unsigned const N, double const len, double const pipe_rad,
+        Point const &B, Particle const &particle, unsigned const ntrk) {
+
+    fstream fout;
+    string file = "track" + to_string(ntrk) + ".csv";
+    fout.open(file, ios::out | ios::trunc);
+
+    Point p_xy = {particle.p.x, particle.p.y, 0};
+    Point rho = dot(c * 1e-3 * modulus_(particle.p) / (particle.charge * modulus_(B) * modulus_(p_xy)), vect_prod(particle.p, B));
+    double beta = calc_angle(particle.p.y / sqrt(modulus_(p_xy)), particle.p.x / sqrt(modulus_(p_xy)));
+    double R = sqrt(modulus_({pipes[N- 2][0].point.x, pipes[ N -2][0].point.y, 0})) - pipe_rad;
+
+    double phi = 0, phi0 = acos(1 - R * R / (2 * modulus_(rho))), d_phi = phi0 / 500;
+
+    while (phi <= phi0) {
+        Point r = {sqrt(modulus_(rho)) * sin(phi - beta) + rho.x, sqrt(modulus_(rho)) * cos(phi - beta) + rho.y,
+        sqrt(modulus_(rho)) * particle.p.z * phi / sqrt(modulus_(p_xy))}; ///current position of the particle in XYZ
+
+        if (abs(r.z) > len) break;
+
+        fout << "NTRK,x,y,z" << "\n";
+        fout << ntrk << "," << r.x << "," << r.y << "," << r.z << "\n";
+
+        phi += d_phi;
+    }
+    fout.close();
+}
+
 void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len, double const pipe_rad,
         Point const &B, Particle const &particle, unsigned const ntrk, vector<Hit> &hits) {
     ///Description: detects hits for a particle
@@ -158,6 +187,8 @@ void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len
     ///             3.iterates through this angle, particle coordinates transfers to XYZ system
     ///             and checks for hits by calc of dist between particle and wire
     ///             (if it is less than pipe_rad -> hit)
+
+    get_track(pipes, N, len, pipe_rad, B, particle, ntrk);
 
     Point p_xy = {particle.p.x, particle.p.y, 0}; ///perpendicular component of particle momentum to Z axis
     Point rho = dot(c * 1e-3 * modulus_(particle.p) / (particle.charge * modulus_(B) * modulus_(p_xy)), vect_prod(particle.p, B)); ///helix radius
@@ -232,7 +263,7 @@ int main() {
     uniform_int_distribution<unsigned> dstr(1, 10);
     uniform_int_distribution<unsigned> seed_dstr(1, 1000);
 
-    unsigned num_particles = dstr(rng);
+    unsigned num_particles = 2;
     cout << num_particles << endl;
     Particle *particles = new Particle[num_particles];
     vector<Hit> hits;
