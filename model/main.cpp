@@ -86,9 +86,9 @@ void particle_parameters(Particle &particle, unsigned const num_particles, unsig
 
     default_random_engine rng(seed);
     uniform_real_distribution<double> dstr(-500, 500);
-    particle.p.x = dstr(rng);
-    particle.p.y = dstr(rng);
-    particle.p.z = dstr(rng);
+    particle.p.x = -2;
+    particle.p.y = 0;
+    particle.p.z = 0;
 }
 
 Point rotate_coord_system(Point const &point, double const angle) {
@@ -159,7 +159,8 @@ void get_track(vector<Wire> const *pipes, unsigned const N, double const len, do
     fout.open(file, ios::out | ios::trunc);
 
     Point p_xy = {particle.p.x, particle.p.y, 0};
-    Point rho = dot(c * 1e-3 * modulus_(particle.p) / (particle.charge * modulus_(B) * modulus_(p_xy)), vect_prod(particle.p, B));
+    Point rho = dot(1e12/ (c * particle.charge * modulus_(B)), vect_prod(particle.p, B));
+    cout << "rho: " << sqrt(modulus_(rho)) << endl;
     double beta = calc_angle(particle.p.y / sqrt(modulus_(p_xy)), particle.p.x / sqrt(modulus_(p_xy)));
     double R = sqrt(modulus_({pipes[N- 2][0].point.x, pipes[ N -2][0].point.y, 0})) - pipe_rad;
 
@@ -191,7 +192,7 @@ void hit_detection(vector<Wire> const *pipes, unsigned const N, double const len
     get_track(pipes, N, len, pipe_rad, B, particle, ntrk);
 
     Point p_xy = {particle.p.x, particle.p.y, 0}; ///perpendicular component of particle momentum to Z axis
-    Point rho = dot(c * 1e-3 * modulus_(particle.p) / (particle.charge * modulus_(B) * modulus_(p_xy)), vect_prod(particle.p, B)); ///helix radius
+    Point rho = dot(1e12/ (c * particle.charge * modulus_(B)), vect_prod(particle.p, B)); ///helix radius
     double beta = calc_angle(particle.p.y / sqrt(modulus_(p_xy)), particle.p.x / sqrt(modulus_(p_xy)));
     ///iteration through layers
     for (unsigned i = 0; i < N; i++) {
@@ -263,7 +264,7 @@ int main() {
     uniform_int_distribution<unsigned> dstr(1, 10);
     uniform_int_distribution<unsigned> seed_dstr(1, 1000);
 
-    unsigned num_particles = 2;
+    unsigned num_particles = 1;
     cout << num_particles << endl;
     Particle *particles = new Particle[num_particles];
     vector<Hit> hits;
